@@ -34,55 +34,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
-var PAGESIZE = 65536;
-var BASE_MEMORY = 0;
-var canvas;
-var ctx;
-var imgData;
-var width;
-var height;
-var bootstrap = function () {
-    height = window.innerHeight;
-    width = window.innerWidth;
-    canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    document.body.appendChild(canvas);
-    ctx = canvas.getContext('2d');
-    ctx.scale(2, 2);
-    imgData = ctx.createImageData(width, height);
-};
-var drawCanvas = function (linearMem) {
-    imgData.data.set(linearMem);
-    ctx.putImageData(imgData, 0, 0);
-};
-var init = function () { return __awaiter(_this, void 0, void 0, function () {
-    var imports;
-    return __generator(this, function (_a) {
-        imports = {
+var Canvas = (function () {
+    function Canvas() {
+        var _this = this;
+        this.update = function (linearMem) {
+            _this.imgData.data.set(linearMem);
+        };
+        this.draw = function () {
+            _this.ctx.putImageData(_this.imgData, 0, 0);
+        };
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        this.ctx = this.canvas.getContext('2d');
+        this.ctx.scale(2, 2);
+        document.body.appendChild(this.canvas);
+        this.imgData = this.ctx.createImageData(this.width, this.height);
+    }
+    return Canvas;
+}());
+var Mandelbrot = (function () {
+    function Mandelbrot(canvas, maxIter) {
+        var _this = this;
+        if (maxIter === void 0) { maxIter = 150; }
+        this.memoryBase = 0;
+        this.pageSize = 65536;
+        this.run = function () { return __awaiter(_this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                fetch('build/untouched.wasm')
+                    .then(function (response) { return response.arrayBuffer(); })
+                    .then(function (buffer) { return WebAssembly.instantiate(buffer, _this.imports); })
+                    .then(function (module) {
+                    var _a = module.instance.exports, mandelbrot = _a.mandelbrot, getDataBuffer = _a.getDataBuffer, memory = _a.memory;
+                    mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
+                    var offset = getDataBuffer();
+                    var linearMem = new Uint8Array(memory.buffer, offset, _this.canvas.width * _this.canvas.height * 4);
+                    _this.canvas.update(linearMem);
+                    _this.canvas.draw();
+                });
+                return [2];
+            });
+        }); };
+        this.maxIter = maxIter;
+        this.canvas = canvas;
+        this.imports = {
             env: {
-                memoryBase: BASE_MEMORY,
+                memoryBase: this.memoryBase,
                 memory: new WebAssembly.Memory({
-                    initial: Math.floor((width * height * 4) / PAGESIZE) + 1
+                    initial: Math.floor((this.canvas.width * this.canvas.height * 4) / this.pageSize) + 1
                 }),
-                abort: function () { },
-                imported_func: function (arg) { return console.log(arg); }
+                abort: function () { }
             }
         };
-        fetch('build/untouched.wasm')
-            .then(function (response) { return response.arrayBuffer(); })
-            .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); })
-            .then(function (module) {
-            var _a = module.instance.exports, mandelbrot = _a.mandelbrot, getDataBuffer = _a.getDataBuffer, memory = _a.memory;
-            mandelbrot(width, height, 150);
-            var offset = getDataBuffer();
-            var linearMem = new Uint8Array(memory.buffer, offset, width * height * 4);
-            drawCanvas(linearMem);
-        });
-        return [2];
-    });
-}); };
-bootstrap();
-init();
+    }
+    return Mandelbrot;
+}());
+var canvas = new Canvas();
+var mandelbrot = new Mandelbrot(canvas);
+mandelbrot.run();
 //# sourceMappingURL=index.js.map
