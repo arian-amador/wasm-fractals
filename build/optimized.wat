@@ -21,7 +21,7 @@
  (data (i32.const 416) "\04\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\001\00\00\00\02")
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
- (global $assembly/index/data (mut i32) (i32.const 0))
+ (global $assembly/mandelbrot/data (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 416))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
@@ -29,8 +29,8 @@
  (export "__release" (func $~lib/rt/pure/__release))
  (export "__collect" (func $~lib/rt/pure/__collect))
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
- (export "mandelbrot" (func $assembly/index/mandelbrot))
- (export "getDataBuffer" (func $assembly/index/getDataBuffer))
+ (export "mandelbrot" (func $assembly/mandelbrot/mandelbrot))
+ (export "getDataBuffer" (func $assembly/mandelbrot/getDataBuffer))
  (func $~lib/rt/tlsf/removeBlock (; 1 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -1399,7 +1399,7 @@
   i32.store offset=8
   local.get $0
  )
- (func $assembly/index/check (; 16 ;) (param $0 f64) (param $1 f64) (param $2 i32) (result i32)
+ (func $assembly/mandelbrot/check (; 16 ;) (param $0 f64) (param $1 f64) (param $2 i32) (result i32)
   (local $3 f64)
   (local $4 f64)
   (local $5 i32)
@@ -1472,7 +1472,7 @@
   local.get $2
   i32.store8
  )
- (func $assembly/index/mandelbrot (; 18 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $assembly/mandelbrot/mandelbrot (; 18 ;) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1491,9 +1491,9 @@
   i32.const 2
   i32.shl
   call $~lib/arraybuffer/ArrayBufferView#constructor
-  global.get $assembly/index/data
+  global.get $assembly/mandelbrot/data
   call $~lib/rt/pure/__release
-  global.set $assembly/index/data
+  global.set $assembly/mandelbrot/data
   f64.const 4.5
   local.get $0
   i32.const 1
@@ -1548,9 +1548,9 @@
       f64.add
       local.get $10
       local.get $2
-      call $assembly/index/check
+      call $assembly/mandelbrot/check
       local.set $5
-      global.get $assembly/index/data
+      global.get $assembly/mandelbrot/data
       local.get $4
       local.get $0
       local.get $3
@@ -1563,7 +1563,7 @@
       i32.const 12
       i32.mul
       call $~lib/typedarray/Uint8Array#__set
-      global.get $assembly/index/data
+      global.get $assembly/mandelbrot/data
       local.get $6
       i32.const 1
       i32.add
@@ -1573,7 +1573,7 @@
       i32.const 127
       i32.and
       call $~lib/typedarray/Uint8Array#__set
-      global.get $assembly/index/data
+      global.get $assembly/mandelbrot/data
       local.get $6
       i32.const 2
       i32.add
@@ -1585,7 +1585,7 @@
       i32.const 356
       i32.rem_u
       call $~lib/typedarray/Uint8Array#__set
-      global.get $assembly/index/data
+      global.get $assembly/mandelbrot/data
       local.get $6
       i32.const 3
       i32.add
@@ -1606,8 +1606,8 @@
    end
   end
  )
- (func $assembly/index/getDataBuffer (; 19 ;) (result i32)
-  global.get $assembly/index/data
+ (func $assembly/mandelbrot/getDataBuffer (; 19 ;) (result i32)
+  global.get $assembly/mandelbrot/data
   i32.load
   call $~lib/rt/pure/__retain
  )

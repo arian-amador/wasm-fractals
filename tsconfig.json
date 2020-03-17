@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2016", "DOM"],
+    // "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outFile": "index.js",
+    "module": "amd"
+  },
+  "exclude": ["node_modules", "assembly/**/*.ts"],
+  "include": ["src/**/*.ts"]
+}
