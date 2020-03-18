@@ -1,5 +1,3 @@
-let data: Uint8Array;
-
 function check(x: f64, y: f64, max: i32, threshold: i32): i32 {
   let Z_re = x;
   let Z_im = y;
@@ -20,9 +18,6 @@ function check(x: f64, y: f64, max: i32, threshold: i32): i32 {
 }
 
 export function mandelbrot(width: i32, height: i32, maxIter: i32): void {
-  // memory used to hold rgba pixel data
-  data = new Uint8Array(width * height * 4);
-
   // Scale real numbers(x-axis) from pixel coordinates to complex numbers
   let minReal = -2.5;
   let maxReal = 2.0;
@@ -38,18 +33,21 @@ export function mandelbrot(width: i32, height: i32, maxIter: i32): void {
 
     for (let x = 0; x < width; x++) {
       let xScaled = minReal + x * realScale;
-
       let iterations = check(xScaled, yScaled, maxIter, 5);
       let idx = (x + y * width) << 2;
-      data[idx + 0] = 1 * iterations * 12;
-      data[idx + 1] = (128 * iterations * 4) % 128;
-      data[idx + 2] = (356 * iterations * 4) % 356;
-      data[idx + 3] = 255;
+
+      store<u8>(idx + 0, 1 * iterations * 12);
+      store<u8>(idx + 1, (128 * iterations * 4) % 128);
+      store<u8>(idx + 2, (356 * iterations * 4) % 356);
+      store<u8>(idx + 3, 255);
     }
   }
 }
 
-// getDataBuffer returns an ArrayBuffer of u8 byte array
-export function getDataBuffer(): ArrayBuffer {
-  return <ArrayBuffer>data.buffer;
+export function growMem(pages: i32): i32 {
+  return memory.grow(pages);
+}
+
+export function getMemSize(): i32 {
+  return memory.size();
 }

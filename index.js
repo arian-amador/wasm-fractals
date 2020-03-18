@@ -37,20 +37,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var Canvas = (function () {
     function Canvas() {
         var _this = this;
-        this.update = function (linearMem) {
-            _this.imgData.data.set(linearMem);
-        };
-        this.draw = function () {
-            _this.ctx.putImageData(_this.imgData, 0, 0);
-        };
         this.height = window.innerHeight;
         this.width = window.innerWidth;
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-        this.ctx = this.canvas.getContext('2d');
-        this.ctx.scale(2, 2);
-        document.body.appendChild(this.canvas);
+        this.render = function (linearMem) {
+            _this.imgData.data.set(linearMem.slice(0, _this.byteSize));
+            _this.ctx.putImageData(_this.imgData, 0, 0);
+        };
+        this.size = this.width * this.height;
+        this.byteSize = this.size << 2;
+        var canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        document.body.appendChild(canvas);
+        var ratio = window.devicePixelRatio || 1;
+        this.ctx = canvas.getContext('2d');
+        this.ctx.scale(ratio, ratio);
         this.imgData = this.ctx.createImageData(this.width, this.height);
     }
     return Canvas;
@@ -58,9 +59,7 @@ var Canvas = (function () {
 var Mandelbrot = (function () {
     function Mandelbrot(canvas, maxIter) {
         var _this = this;
-        if (maxIter === void 0) { maxIter = 150; }
-        this.memoryBase = 0;
-        this.pageSize = 65536;
+        if (maxIter === void 0) { maxIter = 50; }
         this.run = function () { return __awaiter(_this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -68,12 +67,10 @@ var Mandelbrot = (function () {
                     .then(function (response) { return response.arrayBuffer(); })
                     .then(function (buffer) { return WebAssembly.instantiate(buffer, _this.imports); })
                     .then(function (module) {
-                    var _a = module.instance.exports, mandelbrot = _a.mandelbrot, getDataBuffer = _a.getDataBuffer, memory = _a.memory;
-                    mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
-                    var offset = getDataBuffer();
-                    var linearMem = new Uint8Array(memory.buffer, offset, _this.canvas.width * _this.canvas.height * 4);
-                    _this.canvas.update(linearMem);
-                    _this.canvas.draw();
+                    var exports = module.instance.exports;
+                    exports.growMem(Math.ceil(_this.canvas.byteSize / 0xffff));
+                    exports.mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
+                    _this.canvas.render(new Uint8Array(exports.memory.buffer));
                 });
                 return [2];
             });
@@ -82,9 +79,8 @@ var Mandelbrot = (function () {
         this.canvas = canvas;
         this.imports = {
             env: {
-                memoryBase: this.memoryBase,
                 memory: new WebAssembly.Memory({
-                    initial: Math.floor((this.canvas.width * this.canvas.height * 4) / this.pageSize) + 1
+                    initial: Math.floor((this.canvas.width * this.canvas.height * 4) / 0xffff)
                 }),
                 abort: function () { }
             }
