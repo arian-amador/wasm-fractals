@@ -1,15 +1,15 @@
 class Canvas {
-  height: number = window.innerHeight;
-  width: number = window.innerWidth;
-
+  height: number;
+  width: number;
   size: number;
-  byteSize: number;
   ctx: CanvasRenderingContext2D;
-  imgData: any;
+  imgData: ImageData;
+  rgbaMem: Uint8Array;
 
   constructor() {
+    this.height = window.innerHeight;
+    this.width = window.innerWidth;
     this.size = this.width * this.height;
-    this.byteSize = this.size << 2;
 
     const canvas = document.createElement('canvas');
     canvas.width = this.width;
@@ -22,8 +22,21 @@ class Canvas {
     this.imgData = this.ctx.createImageData(this.width, this.height);
   }
 
-  render = linearMem => {
-    this.imgData.data.set(linearMem.slice(0, this.byteSize));
+  process = () => {
+    for (let x: number = 0; x < this.width; x++) {
+      for (let y: number = 0; y < this.height; y++) {
+        let pos = y * this.width + x;
+        let iter = this.rgbaMem[pos];
+
+        this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
+        this.imgData.data[pos * 4 + 1] = (128 * iter * 4) % 128;
+        this.imgData.data[pos * 4 + 2] = (356 * iter * 4) % 356;
+        this.imgData.data[pos * 4 + 3] = 255;
+      }
+    }
+  };
+
+  render = () => {
     this.ctx.putImageData(this.imgData, 0, 0);
   };
 }
@@ -45,9 +58,7 @@ class Mandelbrot {
     this.imports = {
       env: {
         memory: new WebAssembly.Memory({
-          initial: Math.floor(
-            (this.canvas.width * this.canvas.height * 4) / 0xffff
-          ),
+          initial: Math.floor(this.canvas.size / 0xffff),
         }),
         abort: () => {},
       },
@@ -61,14 +72,16 @@ class Mandelbrot {
       .then(module => {
         let exports = module.instance.exports;
 
-        exports.growMem(Math.ceil(this.canvas.byteSize / 0xffff));
+        exports.growMem(Math.ceil(this.canvas.size / 0xffff));
         exports.mandelbrot(this.canvas.width, this.canvas.height, this.maxIter);
 
-        this.canvas.render(new Uint8Array(exports.memory.buffer));
+        this.canvas.rgbaMem = new Uint8Array(exports.memory.buffer);
+        this.canvas.process();
+        this.canvas.render();
       });
   };
 }
 
 const canvas = new Canvas();
-const mandelbrot = new Mandelbrot(canvas);
+const mandelbrot = new Mandelbrot(canvas, 350);
 mandelbrot.run();

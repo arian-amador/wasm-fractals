@@ -37,14 +37,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var Canvas = (function () {
     function Canvas() {
         var _this = this;
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
-        this.render = function (linearMem) {
-            _this.imgData.data.set(linearMem.slice(0, _this.byteSize));
+        this.process = function () {
+            for (var x = 0; x < _this.width; x++) {
+                for (var y = 0; y < _this.height; y++) {
+                    var pos = y * _this.width + x;
+                    var iter = _this.rgbaMem[pos];
+                    _this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
+                    _this.imgData.data[pos * 4 + 1] = (128 * iter * 4) % 128;
+                    _this.imgData.data[pos * 4 + 2] = (356 * iter * 4) % 356;
+                    _this.imgData.data[pos * 4 + 3] = 255;
+                }
+            }
+        };
+        this.render = function () {
             _this.ctx.putImageData(_this.imgData, 0, 0);
         };
+        this.height = window.innerHeight;
+        this.width = window.innerWidth;
         this.size = this.width * this.height;
-        this.byteSize = this.size << 2;
         var canvas = document.createElement('canvas');
         canvas.width = this.width;
         canvas.height = this.height;
@@ -68,9 +78,11 @@ var Mandelbrot = (function () {
                     .then(function (buffer) { return WebAssembly.instantiate(buffer, _this.imports); })
                     .then(function (module) {
                     var exports = module.instance.exports;
-                    exports.growMem(Math.ceil(_this.canvas.byteSize / 0xffff));
+                    exports.growMem(Math.ceil(_this.canvas.size / 0xffff));
                     exports.mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
-                    _this.canvas.render(new Uint8Array(exports.memory.buffer));
+                    _this.canvas.rgbaMem = new Uint8Array(exports.memory.buffer);
+                    _this.canvas.process();
+                    _this.canvas.render();
                 });
                 return [2];
             });
@@ -80,7 +92,7 @@ var Mandelbrot = (function () {
         this.imports = {
             env: {
                 memory: new WebAssembly.Memory({
-                    initial: Math.floor((this.canvas.width * this.canvas.height * 4) / 0xffff)
+                    initial: Math.floor(this.canvas.size / 0xffff)
                 }),
                 abort: function () { }
             }
@@ -89,6 +101,6 @@ var Mandelbrot = (function () {
     return Mandelbrot;
 }());
 var canvas = new Canvas();
-var mandelbrot = new Mandelbrot(canvas);
+var mandelbrot = new Mandelbrot(canvas, 350);
 mandelbrot.run();
 //# sourceMappingURL=index.js.map

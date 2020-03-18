@@ -34,20 +34,13 @@ export function mandelbrot(width: i32, height: i32, maxIter: i32): void {
     for (let x = 0; x < width; x++) {
       let xScaled = minReal + x * realScale;
       let iterations = check(xScaled, yScaled, maxIter, 5);
-      let idx = (x + y * width) << 2;
+      let idx = x + y * width;
 
-      store<u8>(idx + 0, 1 * iterations * 12);
-      store<u8>(idx + 1, (128 * iterations * 4) % 128);
-      store<u8>(idx + 2, (356 * iterations * 4) % 356);
-      store<u8>(idx + 3, 255);
+      store<u8>(idx, iterations);
     }
   }
 }
 
 export function growMem(pages: i32): i32 {
   return memory.grow(pages);
-}
-
-export function getMemSize(): i32 {
-  return memory.size();
 }
