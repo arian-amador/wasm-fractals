@@ -1,42 +1,35 @@
-function check(x: f64, y: f64, max: i32, threshold: i32): i32 {
-  let Z_re = x;
-  let Z_im = y;
+function check(imaginary: f64, real: f64, maxIter: u32): u32 {
+  let ixSq: f64, iySq: f64;
+  let ix: f64 = 0.0;
+  let iy: f64 = 0.0;
+  let iteration: u32 = 0;
 
-  for (let i: i32 = 0; i < max; ++i) {
-    let Z_re2 = Z_re * Z_re;
-    let Z_im2 = Z_im * Z_im;
-
-    if (Z_re2 + Z_im2 > threshold) {
-      return i;
-    }
-
-    Z_im = 2 * Z_re * Z_im + y;
-    Z_re = Z_re2 - Z_im2 + x;
+  while ((ixSq = ix * ix) + (iySq = iy * iy) <= 10.0) {
+    iy = 2.0 * ix * iy + imaginary;
+    ix = ixSq - iySq + real;
+    if (iteration >= maxIter) break;
+    ++iteration;
   }
 
-  return 0;
+  return iteration;
 }
 
-export function mandelbrot(width: i32, height: i32, maxIter: i32): void {
-  // Scale real numbers(x-axis) from pixel coordinates to complex numbers
-  let minReal = -2.5;
-  let maxReal = 2.0;
-  let realScale = (maxReal - minReal) / (width + 1);
+export function mandelbrot(width: u32, height: u32, maxIter: u32): void {
+  let x: u32, y: u32, iteration: u32, idx: u32;
+  let real: f64, imaginary: f64;
+  let translateX: f64 = width * (1.0 / 1.6);
+  let translateY: f64 = height * (1.0 / 2.0);
+  let scale: f64 = 10.0 / min(3 * width, 4 * height);
+  let realOffset: f64 = translateX * scale;
 
-  // Scale imaginary numbers(y-axis) from pixel coordinates to complex numbers
-  let minImaginary = -1.25;
-  let maxImaginary = minImaginary + ((maxReal - minReal) * height) / width;
-  let imaginaryScale = (maxImaginary - minImaginary) / (height + 1);
+  for (y = 0; y < height; y++) {
+    imaginary = (y - translateY) * scale;
+    for (x = 0; x < width; x++) {
+      idx = x + y * width;
+      real = x * scale - realOffset;
+      iteration = check(imaginary, real, maxIter);
 
-  for (let y = 0; y < height; y++) {
-    let yScaled = maxImaginary - y * imaginaryScale;
-
-    for (let x = 0; x < width; x++) {
-      let xScaled = minReal + x * realScale;
-      let iterations = check(xScaled, yScaled, maxIter, 5);
-      let idx = x + y * width;
-
-      store<u8>(idx, iterations);
+      store<u8>(idx, iteration);
     }
   }
 }

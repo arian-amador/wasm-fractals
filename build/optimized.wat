@@ -1125,52 +1125,47 @@
   (local $5 i32)
   (local $6 f64)
   (local $7 f64)
-  local.get $0
-  local.set $3
-  local.get $1
-  local.set $4
-  loop $for-loop|0
-   local.get $5
-   local.get $2
-   i32.lt_s
+  loop $while-continue|0
+   local.get $3
+   local.get $3
+   f64.mul
+   local.tee $6
+   local.get $4
+   local.get $4
+   f64.mul
+   local.tee $7
+   f64.add
+   f64.const 10
+   f64.le
    if
-    local.get $3
-    local.get $3
-    f64.mul
-    local.tee $6
-    local.get $4
-    local.get $4
-    f64.mul
-    local.tee $7
-    f64.add
-    f64.const 5
-    f64.gt
-    if
+    block $while-break|0
+     f64.const 2
+     local.get $3
+     f64.mul
+     local.get $4
+     f64.mul
+     local.get $0
+     f64.add
+     local.set $4
+     local.get $6
+     local.get $7
+     f64.sub
+     local.get $1
+     f64.add
+     local.set $3
      local.get $5
-     return
+     local.get $2
+     i32.ge_u
+     br_if $while-break|0
+     local.get $5
+     i32.const 1
+     i32.add
+     local.set $5
+     br $while-continue|0
     end
-    f64.const 2
-    local.get $3
-    f64.mul
-    local.get $4
-    f64.mul
-    local.get $1
-    f64.add
-    local.set $4
-    local.get $6
-    local.get $7
-    f64.sub
-    local.get $0
-    f64.add
-    local.set $3
-    local.get $5
-    i32.const 1
-    i32.add
-    local.set $5
-    br $for-loop|0
    end
   end
-  i32.const 0
+  local.get $5
  )
  (func $assembly/mandelbrot/mandelbrot (; 15 ;) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
@@ -1179,76 +1174,80 @@
   (local $6 f64)
   (local $7 f64)
   (local $8 f64)
-  f64.const 4.5
-  local.get $0
-  i32.const 1
-  i32.add
-  f64.convert_i32_s
-  f64.div
-  local.set $5
-  f64.const -1.25
-  f64.const 4.5
   local.get $1
-  f64.convert_i32_s
+  f64.convert_i32_u
+  f64.const 0.5
   f64.mul
+  local.set $6
   local.get $0
-  f64.convert_i32_s
-  f64.div
-  f64.add
-  local.tee $6
-  f64.const -1.25
-  f64.sub
+  f64.convert_i32_u
+  f64.const 0.625
+  f64.mul
+  f64.const 10
+  local.get $0
+  i32.const 3
+  i32.mul
+  local.tee $3
   local.get $1
-  i32.const 1
-  i32.add
+  i32.const 2
+  i32.shl
+  local.tee $4
+  local.get $3
+  local.get $4
+  i32.lt_s
+  select
   f64.convert_i32_s
   f64.div
+  local.tee $5
+  f64.mul
   local.set $7
+  i32.const 0
+  local.set $3
   loop $for-loop|0
-   local.get $4
+   local.get $3
    local.get $1
-   i32.lt_s
+   i32.lt_u
    if
+    local.get $3
+    f64.convert_i32_u
     local.get $6
-    local.get $4
-    f64.convert_i32_s
-    local.get $7
-    f64.mul
     f64.sub
+    local.get $5
+    f64.mul
     local.set $8
     i32.const 0
-    local.set $3
+    local.set $4
     loop $for-loop|1
-     local.get $3
+     local.get $4
      local.get $0
-     i32.lt_s
+     i32.lt_u
      if
-      local.get $3
-      local.get $0
       local.get $4
+      local.get $0
+      local.get $3
       i32.mul
       i32.add
-      f64.const -2.5
-      local.get $3
-      f64.convert_i32_s
+      local.get $8
+      local.get $4
+      f64.convert_i32_u
       local.get $5
       f64.mul
-      f64.add
-      local.get $8
+      local.get $7
+      f64.sub
       local.get $2
       call $assembly/mandelbrot/check
       i32.store8
-      local.get $3
+      local.get $4
       i32.const 1
       i32.add
-      local.set $3
+      local.set $4
       br $for-loop|1
      end
     end
-    local.get $4
+    local.get $3
     i32.const 1
     i32.add
-    local.set $4
+    local.set $3
     br $for-loop|0
    end
   end

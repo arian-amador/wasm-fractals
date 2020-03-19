@@ -2,60 +2,75 @@ class Canvas {
   height: number;
   width: number;
   size: number;
+  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   imgData: ImageData;
   rgbaMem: Uint8Array;
 
   constructor() {
-    this.height = window.innerHeight;
-    this.width = window.innerWidth;
-    this.size = this.width * this.height;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = this.width;
-    canvas.height = this.height;
-    document.body.appendChild(canvas);
-
+    this.canvas = document.createElement('canvas');
     const ratio = window.devicePixelRatio || 1;
-    this.ctx = canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d');
     this.ctx.scale(ratio, ratio);
-    this.imgData = this.ctx.createImageData(this.width, this.height);
+    this.setSize();
   }
 
   process = () => {
+    this.imgData = this.ctx.createImageData(this.width, this.height);
+
     for (let x: number = 0; x < this.width; x++) {
       for (let y: number = 0; y < this.height; y++) {
         let pos = y * this.width + x;
         let iter = this.rgbaMem[pos];
 
         this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
-        this.imgData.data[pos * 4 + 1] = (128 * iter * 4) % 128;
-        this.imgData.data[pos * 4 + 2] = (356 * iter * 4) % 356;
+        this.imgData.data[pos * 4 + 1] = (10 * iter * 4) % 10;
+        this.imgData.data[pos * 4 + 2] = (10 * iter * 4) % 10;
         this.imgData.data[pos * 4 + 3] = 255;
       }
     }
   };
 
   render = () => {
+    document.body.appendChild(this.canvas);
     this.ctx.putImageData(this.imgData, 0, 0);
+  };
+
+  setSize = () => {
+    this.height = window.innerHeight;
+    this.width = window.innerWidth;
+    this.size = this.width * this.height;
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
   };
 }
 
 class Mandelbrot {
+  debounceDuration: number = 100;
+  debounceTimeoutHandle: NodeJS.Timeout;
+
   maxIter: number;
   canvas: Canvas;
-  imports: {
-    env: {
-      memory: WebAssembly.Memory;
-      abort: () => void;
-    };
-  };
 
-  constructor(canvas: Canvas, maxIter: number = 50) {
+  constructor(canvas: Canvas, maxIter: number = 150) {
     this.maxIter = maxIter;
     this.canvas = canvas;
 
-    this.imports = {
+    addEventListener('resize', this.debouncedResize);
+  }
+
+  debouncedResize = () => {
+    clearTimeout(this.debounceTimeoutHandle);
+    this.debounceTimeoutHandle = setTimeout(this.resize, this.debounceDuration);
+  };
+
+  resize = () => {
+    this.canvas.setSize();
+    this.run();
+  };
+
+  run = async () => {
+    const imports = {
       env: {
         memory: new WebAssembly.Memory({
           initial: Math.floor(this.canvas.size / 0xffff),
@@ -63,12 +78,10 @@ class Mandelbrot {
         abort: () => {},
       },
     };
-  }
 
-  run = async () => {
     fetch('build/untouched.wasm')
       .then(response => response.arrayBuffer())
-      .then(buffer => WebAssembly.instantiate(buffer, this.imports))
+      .then(buffer => WebAssembly.instantiate(buffer, imports))
       .then(module => {
         let exports = module.instance.exports;
 
@@ -83,5 +96,5 @@ class Mandelbrot {
 }
 
 const canvas = new Canvas();
-const mandelbrot = new Mandelbrot(canvas, 350);
+const mandelbrot = new Mandelbrot(canvas, 256);
 mandelbrot.run();

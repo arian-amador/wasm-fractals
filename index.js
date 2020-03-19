@@ -38,44 +38,65 @@ var Canvas = (function () {
     function Canvas() {
         var _this = this;
         this.process = function () {
+            _this.imgData = _this.ctx.createImageData(_this.width, _this.height);
             for (var x = 0; x < _this.width; x++) {
                 for (var y = 0; y < _this.height; y++) {
                     var pos = y * _this.width + x;
                     var iter = _this.rgbaMem[pos];
                     _this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
-                    _this.imgData.data[pos * 4 + 1] = (128 * iter * 4) % 128;
-                    _this.imgData.data[pos * 4 + 2] = (356 * iter * 4) % 356;
+                    _this.imgData.data[pos * 4 + 1] = (10 * iter * 4) % 10;
+                    _this.imgData.data[pos * 4 + 2] = (10 * iter * 4) % 10;
                     _this.imgData.data[pos * 4 + 3] = 255;
                 }
             }
         };
         this.render = function () {
+            document.body.appendChild(_this.canvas);
             _this.ctx.putImageData(_this.imgData, 0, 0);
         };
-        this.height = window.innerHeight;
-        this.width = window.innerWidth;
-        this.size = this.width * this.height;
-        var canvas = document.createElement('canvas');
-        canvas.width = this.width;
-        canvas.height = this.height;
-        document.body.appendChild(canvas);
+        this.setSize = function () {
+            _this.height = window.innerHeight;
+            _this.width = window.innerWidth;
+            _this.size = _this.width * _this.height;
+            _this.canvas.width = _this.width;
+            _this.canvas.height = _this.height;
+        };
+        this.canvas = document.createElement('canvas');
         var ratio = window.devicePixelRatio || 1;
-        this.ctx = canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d');
         this.ctx.scale(ratio, ratio);
-        this.imgData = this.ctx.createImageData(this.width, this.height);
+        this.setSize();
     }
     return Canvas;
 }());
 var Mandelbrot = (function () {
     function Mandelbrot(canvas, maxIter) {
         var _this = this;
-        if (maxIter === void 0) { maxIter = 50; }
+        if (maxIter === void 0) { maxIter = 150; }
+        this.debounceDuration = 100;
+        this.debouncedResize = function () {
+            clearTimeout(_this.debounceTimeoutHandle);
+            _this.debounceTimeoutHandle = setTimeout(_this.resize, _this.debounceDuration);
+        };
+        this.resize = function () {
+            _this.canvas.setSize();
+            _this.run();
+        };
         this.run = function () { return __awaiter(_this, void 0, void 0, function () {
+            var imports;
             var _this = this;
             return __generator(this, function (_a) {
+                imports = {
+                    env: {
+                        memory: new WebAssembly.Memory({
+                            initial: Math.floor(this.canvas.size / 0xffff)
+                        }),
+                        abort: function () { }
+                    }
+                };
                 fetch('build/untouched.wasm')
                     .then(function (response) { return response.arrayBuffer(); })
-                    .then(function (buffer) { return WebAssembly.instantiate(buffer, _this.imports); })
+                    .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); })
                     .then(function (module) {
                     var exports = module.instance.exports;
                     exports.growMem(Math.ceil(_this.canvas.size / 0xffff));
@@ -89,18 +110,11 @@ var Mandelbrot = (function () {
         }); };
         this.maxIter = maxIter;
         this.canvas = canvas;
-        this.imports = {
-            env: {
-                memory: new WebAssembly.Memory({
-                    initial: Math.floor(this.canvas.size / 0xffff)
-                }),
-                abort: function () { }
-            }
-        };
+        addEventListener('resize', this.debouncedResize);
     }
     return Mandelbrot;
 }());
 var canvas = new Canvas();
-var mandelbrot = new Mandelbrot(canvas, 350);
+var mandelbrot = new Mandelbrot(canvas, 256);
 mandelbrot.run();
 //# sourceMappingURL=index.js.map
