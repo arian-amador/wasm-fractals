@@ -43,9 +43,11 @@ var Canvas = (function () {
                 for (var y = 0; y < _this.height; y++) {
                     var pos = y * _this.width + x;
                     var iter = _this.rgbaMem[pos];
-                    _this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
-                    _this.imgData.data[pos * 4 + 1] = (10 * iter * 4) % 10;
-                    _this.imgData.data[pos * 4 + 2] = (10 * iter * 4) % 10;
+                    _this.imgData.data[pos * 4 + 0] = (iter * _this.intensity) % _this.red;
+                    _this.imgData.data[pos * 4 + 1] =
+                        (iter * _this.intensity - 1) % _this.green;
+                    _this.imgData.data[pos * 4 + 2] =
+                        (iter * _this.intensity - 2) % _this.blue;
                     _this.imgData.data[pos * 4 + 3] = 255;
                 }
             }
@@ -61,10 +63,36 @@ var Canvas = (function () {
             _this.canvas.width = _this.width;
             _this.canvas.height = _this.height;
         };
+        this.setSliderOnInput = function () {
+            var ctx = _this;
+            Array.from(document.getElementsByClassName('rangeSlider')).forEach(function (slider) {
+                slider.oninput = function () {
+                    ctx.getSliderValues();
+                    ctx.process();
+                    ctx.render();
+                };
+            });
+            _this.getSliderValues();
+        };
+        this.getSliderValues = function () {
+            var i = document.getElementById('intensityRange').value;
+            var r = document.getElementById('redRange').value;
+            var g = document.getElementById('greenRange').value;
+            var b = document.getElementById('blueRange').value;
+            document.getElementById('intensityVal').innerHTML = i;
+            document.getElementById('redVal').innerHTML = r;
+            document.getElementById('greenVal').innerHTML = g;
+            document.getElementById('blueVal').innerHTML = b;
+            _this.intensity = i - 0;
+            _this.red = r - 0;
+            _this.green = g - 0;
+            _this.blue = b - 0;
+        };
         this.canvas = document.createElement('canvas');
         var ratio = window.devicePixelRatio || 1;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.scale(ratio, ratio);
+        this.setSliderOnInput();
         this.setSize();
     }
     return Canvas;

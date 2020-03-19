@@ -6,12 +6,18 @@ class Canvas {
   ctx: CanvasRenderingContext2D;
   imgData: ImageData;
   rgbaMem: Uint8Array;
+  intensity: number;
+  red: number;
+  green: number;
+  blue: number;
 
   constructor() {
     this.canvas = document.createElement('canvas');
     const ratio = window.devicePixelRatio || 1;
     this.ctx = this.canvas.getContext('2d');
     this.ctx.scale(ratio, ratio);
+
+    this.setSliderOnInput();
     this.setSize();
   }
 
@@ -23,9 +29,11 @@ class Canvas {
         let pos = y * this.width + x;
         let iter = this.rgbaMem[pos];
 
-        this.imgData.data[pos * 4 + 0] = 1 * iter * 12;
-        this.imgData.data[pos * 4 + 1] = (10 * iter * 4) % 10;
-        this.imgData.data[pos * 4 + 2] = (10 * iter * 4) % 10;
+        this.imgData.data[pos * 4 + 0] = (iter * this.intensity) % this.red;
+        this.imgData.data[pos * 4 + 1] =
+          (iter * this.intensity - 1) % this.green;
+        this.imgData.data[pos * 4 + 2] =
+          (iter * this.intensity - 2) % this.blue;
         this.imgData.data[pos * 4 + 3] = 255;
       }
     }
@@ -42,6 +50,39 @@ class Canvas {
     this.size = this.width * this.height;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+  };
+
+  setSliderOnInput = () => {
+    let ctx = this;
+
+    Array.from(document.getElementsByClassName('rangeSlider')).forEach(
+      slider => {
+        slider.oninput = function() {
+          ctx.getSliderValues();
+          ctx.process();
+          ctx.render();
+        };
+      }
+    );
+
+    this.getSliderValues();
+  };
+
+  getSliderValues = () => {
+    let i = document.getElementById('intensityRange').value;
+    let r = document.getElementById('redRange').value;
+    let g = document.getElementById('greenRange').value;
+    let b = document.getElementById('blueRange').value;
+
+    document.getElementById('intensityVal').innerHTML = i;
+    document.getElementById('redVal').innerHTML = r;
+    document.getElementById('greenVal').innerHTML = g;
+    document.getElementById('blueVal').innerHTML = b;
+
+    this.intensity = i - 0;
+    this.red = r - 0;
+    this.green = g - 0;
+    this.blue = b - 0;
   };
 }
 

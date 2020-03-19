@@ -8,15 +8,49 @@
   <style>
     html,
     body {
-      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
       margin: 0 !important;
+      overflow: hidden;
       padding: 0 !important;
     }
-  </style>
 
+    #controlsContainer {
+      margin: 0;
+      padding: 10px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 250px;
+      background: #ffffff2b;
+      color: #ccc;
+      border-radius: 5px;
+      border: 1px solid #565652;
+    }
+
+    label {
+      float: left;
+      width: 100px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 </head>
 
 <body>
+  <div id="controlsContainer">
+    <label name="intensityRange">Intensity (<span id="intensityVal"></span>)</label>
+    <input class="rangeSlider" id="intensityRange" type="range" min="0" max="32" value="15">
+
+    <label name="redRange">Red (<span id="redVal"></span>)</label>
+    <input class="rangeSlider" id="redRange" type="range" min="0" max="255" value="255">
+
+    <label name="greenRange">Green (<span id="greenVal"></span>)</label>
+    <input class="rangeSlider" id="greenRange" type="range" min="0" max="255" value="0">
+
+    <label name="blueRange">Blue (<span id="blueVal"></span>)</label>
+    <input class="rangeSlider" id="blueRange" type="range" min="0" max="255" value="0">
+  </div>
   <script src="index.js"></script>
 </body>
 
