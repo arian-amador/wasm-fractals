@@ -1529,58 +1529,67 @@
   (local $8 f64)
   (local $9 f64)
   (local $10 f64)
-  (local $11 i32)
-  (local $12 i32)
+  (local $11 f64)
+  (local $12 f64)
   (local $13 f64)
-  (local $14 f64)
+  (local $14 i32)
+  (local $15 i32)
+  (local $16 f64)
+  (local $17 f64)
+  f64.const 1.6
+  local.set $9
+  f64.const 2
+  local.set $10
+  f64.const 10
+  local.set $11
   local.get $0
   f64.convert_i32_u
   f64.const 1
-  f64.const 1.6
+  local.get $9
   f64.div
   f64.mul
-  local.set $9
+  local.set $12
   local.get $1
   f64.convert_i32_u
   f64.const 1
-  f64.const 2
+  local.get $10
   f64.div
   f64.mul
-  local.set $10
-  f64.const 10
+  local.set $13
+  local.get $11
   i32.const 3
   local.get $0
   i32.mul
-  local.tee $11
+  local.tee $14
   i32.const 4
   local.get $1
   i32.mul
-  local.tee $12
-  local.get $11
-  local.get $12
+  local.tee $15
+  local.get $14
+  local.get $15
   i32.lt_s
   select
   f64.convert_i32_s
   f64.div
-  local.set $13
-  local.get $9
-  local.get $13
+  local.set $16
+  local.get $12
+  local.get $16
   f64.mul
-  local.set $14
+  local.set $17
   i32.const 0
   local.set $4
   loop $for-loop|0
    local.get $4
    local.get $1
    i32.lt_u
-   local.set $11
-   local.get $11
+   local.set $14
+   local.get $14
    if
     local.get $4
     f64.convert_i32_u
-    local.get $10
-    f64.sub
     local.get $13
+    f64.sub
+    local.get $16
     f64.mul
     local.set $8
     i32.const 0
@@ -1589,8 +1598,8 @@
      local.get $3
      local.get $0
      i32.lt_u
-     local.set $12
-     local.get $12
+     local.set $15
+     local.get $15
      if
       local.get $3
       local.get $4
@@ -1600,9 +1609,9 @@
       local.set $6
       local.get $3
       f64.convert_i32_u
-      local.get $13
+      local.get $16
       f64.mul
-      local.get $14
+      local.get $17
       f64.sub
       local.set $7
       local.get $8

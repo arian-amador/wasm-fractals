@@ -17,9 +17,14 @@ function check(imaginary: f64, real: f64, maxIter: u32): u32 {
 export function mandelbrot(width: u32, height: u32, maxIter: u32): void {
   let x: u32, y: u32, iteration: u32, idx: u32;
   let real: f64, imaginary: f64;
-  let translateX: f64 = width * (1.0 / 1.6);
-  let translateY: f64 = height * (1.0 / 2.0);
-  let scale: f64 = 10.0 / min(3 * width, 4 * height);
+
+  let offsetX: f64 = 1.6;
+  let offsetY: f64 = 2.0;
+  let zoom: f64 = 10.0;
+
+  let translateX: f64 = width * (1.0 / offsetX);
+  let translateY: f64 = height * (1.0 / offsetY);
+  let scale: f64 = zoom / min(3 * width, 4 * height);
   let realOffset: f64 = translateX * scale;
 
   for (y = 0; y < height; y++) {
