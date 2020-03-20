@@ -1,5 +1,9 @@
 # WASM Fractals
 
+#### Install TypeScript
+```
+npm install -g typescript
+```
 #### Install necessary packages
 ```
 npm install
