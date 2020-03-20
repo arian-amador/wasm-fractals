@@ -83,10 +83,10 @@ var Canvas = (function () {
             document.getElementById('redVal').innerHTML = r;
             document.getElementById('greenVal').innerHTML = g;
             document.getElementById('blueVal').innerHTML = b;
-            _this.intensity = i - 0;
-            _this.red = r - 0;
-            _this.green = g - 0;
-            _this.blue = b - 0;
+            _this.intensity = Number(i);
+            _this.red = Number(r);
+            _this.green = Number(g);
+            _this.blue = Number(b);
         };
         this.canvas = document.createElement('canvas');
         var ratio = window.devicePixelRatio || 1;

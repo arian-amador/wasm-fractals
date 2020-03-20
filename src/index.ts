@@ -57,7 +57,7 @@ class Canvas {
 
     Array.from(document.getElementsByClassName('rangeSlider')).forEach(
       slider => {
-        slider.oninput = function() {
+        (<HTMLInputElement>slider).oninput = function() {
           ctx.getSliderValues();
           ctx.process();
           ctx.render();
@@ -69,20 +69,20 @@ class Canvas {
   };
 
   getSliderValues = () => {
-    let i = document.getElementById('intensityRange').value;
-    let r = document.getElementById('redRange').value;
-    let g = document.getElementById('greenRange').value;
-    let b = document.getElementById('blueRange').value;
+    let i = (<HTMLInputElement>document.getElementById('intensityRange')).value;
+    let r = (<HTMLInputElement>document.getElementById('redRange')).value;
+    let g = (<HTMLInputElement>document.getElementById('greenRange')).value;
+    let b = (<HTMLInputElement>document.getElementById('blueRange')).value;
 
     document.getElementById('intensityVal').innerHTML = i;
     document.getElementById('redVal').innerHTML = r;
     document.getElementById('greenVal').innerHTML = g;
     document.getElementById('blueVal').innerHTML = b;
 
-    this.intensity = i - 0;
-    this.red = r - 0;
-    this.green = g - 0;
-    this.blue = b - 0;
+    this.intensity = Number(i);
+    this.red = Number(r);
+    this.green = Number(g);
+    this.blue = Number(b);
   };
 }
 
@@ -129,7 +129,9 @@ class Mandelbrot {
         exports.growMem(Math.ceil(this.canvas.size / 0xffff));
         exports.mandelbrot(this.canvas.width, this.canvas.height, this.maxIter);
 
-        this.canvas.rgbaMem = new Uint8Array(exports.memory.buffer);
+        this.canvas.rgbaMem = new Uint8Array(
+          (<WebAssembly.Memory>exports.memory).buffer
+        );
         this.canvas.process();
         this.canvas.render();
       });
