@@ -122,7 +122,7 @@ var Mandelbrot = (function () {
                         abort: function () { }
                     }
                 };
-                fetch('build/untouched.wasm')
+                fetch('build/optimized.wasm')
                     .then(function (response) { return response.arrayBuffer(); })
                     .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); })
                     .then(function (module) {

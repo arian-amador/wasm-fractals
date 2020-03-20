@@ -120,7 +120,7 @@ class Mandelbrot {
       },
     };
 
-    fetch('build/untouched.wasm')
+    fetch('build/optimized.wasm')
       .then(response => response.arrayBuffer())
       .then(buffer => WebAssembly.instantiate(buffer, imports))
       .then(module => {
