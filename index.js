@@ -75,18 +75,18 @@ var Canvas = (function () {
             _this.getSliderValues();
         };
         this.getSliderValues = function () {
-            var i = document.getElementById('intensityRange').value;
-            var r = document.getElementById('redRange').value;
-            var g = document.getElementById('greenRange').value;
-            var b = document.getElementById('blueRange').value;
-            document.getElementById('intensityVal').innerHTML = i;
-            document.getElementById('redVal').innerHTML = r;
-            document.getElementById('greenVal').innerHTML = g;
-            document.getElementById('blueVal').innerHTML = b;
-            _this.intensity = Number(i);
-            _this.red = Number(r);
-            _this.green = Number(g);
-            _this.blue = Number(b);
+            var sliders = [
+                { id: 'intensityRange', span: 'intensityVal', prop: 'intensity' },
+                { id: 'redRange', span: 'redVal', prop: 'red' },
+                { id: 'greenRange', span: 'greenVal', prop: 'green' },
+                { id: 'blueRange', span: 'blueVal', prop: 'blue' }
+            ];
+            for (var _i = 0, sliders_1 = sliders; _i < sliders_1.length; _i++) {
+                var slider = sliders_1[_i];
+                var v = document.getElementById(slider['id']).value;
+                document.getElementById(slider['span']).innerHTML = v;
+                _this[slider['prop']] = v;
+            }
         };
         this.canvas = document.createElement('canvas');
         var ratio = window.devicePixelRatio || 1;

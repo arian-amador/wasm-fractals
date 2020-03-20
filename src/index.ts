@@ -69,20 +69,18 @@ class Canvas {
   };
 
   getSliderValues = () => {
-    let i = (<HTMLInputElement>document.getElementById('intensityRange')).value;
-    let r = (<HTMLInputElement>document.getElementById('redRange')).value;
-    let g = (<HTMLInputElement>document.getElementById('greenRange')).value;
-    let b = (<HTMLInputElement>document.getElementById('blueRange')).value;
+    const sliders = [
+      {id:'intensityRange', span:'intensityVal', prop:'intensity'},
+      {id:'redRange', span:'redVal', prop:'red'},
+      {id:'greenRange', span:'greenVal', prop:'green'},
+      {id:'blueRange', span:'blueVal', prop:'blue'}
+    ]
 
-    document.getElementById('intensityVal').innerHTML = i;
-    document.getElementById('redVal').innerHTML = r;
-    document.getElementById('greenVal').innerHTML = g;
-    document.getElementById('blueVal').innerHTML = b;
-
-    this.intensity = Number(i);
-    this.red = Number(r);
-    this.green = Number(g);
-    this.blue = Number(b);
+    for(const slider of sliders) {
+      let v = (<HTMLInputElement>document.getElementById(slider['id'])).value;
+      document.getElementById(slider['span']).innerHTML = v;
+      this[slider['prop']] = v;
+    }
   };
 }
 
