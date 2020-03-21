@@ -3,10 +3,11 @@
     "asbuild:untouched": "asc assembly/mandelbrot.ts -b build/untouched.wasm -t build/untouched.wat --validate --sourceMap --debug",
     "asbuild:optimized": "asc assembly/mandelbrot.ts -b build/optimized.wasm -t build/optimized.wat --validate --sourceMap --optimize",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "tsbuild": "tsc",
     "test": "node tests",
     "serve": "static-server",
     "watch-asm": "npx watch 'npm run asbuild' ./assembly --interval=1",
-    "watch-loader": "npx watch 'tsc' ./src --interval=1",
+    "watch-loader": "npx watch 'npm run tsbuild' ./src --interval=1",
     "watch": "npm run watch-asm & npm run watch-loader"
   },
   "dependencies": {

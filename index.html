@@ -33,23 +33,43 @@
       font-size: 14px;
       font-weight: bold;
     }
+    #sliders-container{
+      margin-bottom: 15px;
+    }
+
+    .source-btn {
+      color: white;
+      float: right;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      text-decoration:none;
+    }
+    .source-btn:after,
+    .source-btn:before{
+      content: " ● ";
+    }
   </style>
   <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <div id="controlsContainer">
-    <label name="intensityRange">Intensity (<span id="intensityVal"></span>)</label>
-    <input class="rangeSlider" id="intensityRange" type="range" min="0" max="32" value="15">
+    <div id="slidersContainer">
+      <label name="intensityRange">Intensity (<span id="intensityVal"></span>)</label>
+      <input class="rangeSlider" id="intensityRange" type="range" min="0" max="32" value="15">
 
-    <label name="redRange">Red (<span id="redVal"></span>)</label>
-    <input class="rangeSlider" id="redRange" type="range" min="0" max="255" value="255">
+      <label name="redRange">Red (<span id="redVal"></span>)</label>
+      <input class="rangeSlider" id="redRange" type="range" min="0" max="255" value="255">
 
-    <label name="greenRange">Green (<span id="greenVal"></span>)</label>
-    <input class="rangeSlider" id="greenRange" type="range" min="0" max="255" value="0">
+      <label name="greenRange">Green (<span id="greenVal"></span>)</label>
+      <input class="rangeSlider" id="greenRange" type="range" min="0" max="255" value="0">
 
-    <label name="blueRange">Blue (<span id="blueVal"></span>)</label>
-    <input class="rangeSlider" id="blueRange" type="range" min="0" max="255" value="0">
+      <label name="blueRange">Blue (<span id="blueVal"></span>)</label>
+      <input class="rangeSlider" id="blueRange" type="range" min="0" max="255" value="0">
+    </div>
+
+    <a class="source-btn" href="https://www.github.com/arian-amador/wasm-fractals" target="_blank">source</a>
   </div>
   <script src="index.js"></script>
 </body>
