@@ -79,7 +79,7 @@ var Canvas = (function () {
                 { id: 'intensityRange', span: 'intensityVal', prop: 'intensity' },
                 { id: 'redRange', span: 'redVal', prop: 'red' },
                 { id: 'greenRange', span: 'greenVal', prop: 'green' },
-                { id: 'blueRange', span: 'blueVal', prop: 'blue' }
+                { id: 'blueRange', span: 'blueVal', prop: 'blue' },
             ];
             for (var _i = 0, sliders_1 = sliders; _i < sliders_1.length; _i++) {
                 var slider = sliders_1[_i];
@@ -127,8 +127,10 @@ var Mandelbrot = (function () {
                     .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); })
                     .then(function (module) {
                     var exports = module.instance.exports;
-                    exports.growMem(Math.ceil(_this.canvas.size / 0xffff));
-                    exports.mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
+                    var growMem = exports.growMem;
+                    var mandelbrot = exports.mandelbrot;
+                    growMem(Math.ceil(_this.canvas.size / 0xffff));
+                    mandelbrot(_this.canvas.width, _this.canvas.height, _this.maxIter);
                     _this.canvas.rgbaMem = new Uint8Array(exports.memory.buffer);
                     _this.canvas.process();
                     _this.canvas.render();

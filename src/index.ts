@@ -70,13 +70,13 @@ class Canvas {
 
   getSliderValues = () => {
     const sliders = [
-      {id:'intensityRange', span:'intensityVal', prop:'intensity'},
-      {id:'redRange', span:'redVal', prop:'red'},
-      {id:'greenRange', span:'greenVal', prop:'green'},
-      {id:'blueRange', span:'blueVal', prop:'blue'}
-    ]
+      { id: 'intensityRange', span: 'intensityVal', prop: 'intensity' },
+      { id: 'redRange', span: 'redVal', prop: 'red' },
+      { id: 'greenRange', span: 'greenVal', prop: 'green' },
+      { id: 'blueRange', span: 'blueVal', prop: 'blue' },
+    ];
 
-    for(const slider of sliders) {
+    for (const slider of sliders) {
       let v = (<HTMLInputElement>document.getElementById(slider['id'])).value;
       document.getElementById(slider['span']).innerHTML = v;
       this[slider['prop']] = v;
@@ -122,14 +122,21 @@ class Mandelbrot {
       .then(response => response.arrayBuffer())
       .then(buffer => WebAssembly.instantiate(buffer, imports))
       .then(module => {
-        let exports = module.instance.exports;
+        // Import WASM module functions
+        const exports = module.instance.exports;
+        const growMem = <any>exports.growMem;
+        const mandelbrot = <any>exports.mandelbrot;
 
-        exports.growMem(Math.ceil(this.canvas.size / 0xffff));
-        exports.mandelbrot(this.canvas.width, this.canvas.height, this.maxIter);
+        // Grow the memory used that hold stride calcs for the full canvas
+        growMem(Math.ceil(this.canvas.size / 0xffff));
+        mandelbrot(this.canvas.width, this.canvas.height, this.maxIter);
 
+        // Get latest WASM memory buffer
         this.canvas.rgbaMem = new Uint8Array(
           (<WebAssembly.Memory>exports.memory).buffer
         );
+
+        // Process strides to pixel and render on screen
         this.canvas.process();
         this.canvas.render();
       });
